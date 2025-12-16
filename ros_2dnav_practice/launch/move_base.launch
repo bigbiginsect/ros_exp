@@ -1,0 +1,31 @@
+<launch>
+  <!-- 
+    启动 move_base 节点。
+    pkg="move_base": 指定了要运行的节点所在的功能包。
+    type="move_base": 指定了要运行的节点的可执行文件。
+    name="move_base": 为这个节点指定一个唯一的名称。
+    respawn="false": 如果节点意外关闭，不自动重启。
+    output="screen": 将节点的日志信息输出到终端屏幕，方便调试。
+    clear_params="true": 在启动前清除私有命名空间中的所有参数，这是一个好习惯，可以防止旧参数干扰。
+  -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
+    
+    <!-- 
+      加载通用代价地图参数。
+      这个文件被加载了两次，一次用于全局代价地图(ns="global_costmap")，一次用于局部代价地图(ns="local_costmap")。
+      "ns" (namespace) 属性非常关键，它确保了参数被正确地传递给了move_base内部的相应组件。
+    -->
+    <rosparam file="$(find ros_2dnav_practice)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find ros_2dnav_practice)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    
+    <!-- 加载局部代价地图的特定参数 -->
+    <rosparam file="$(find ros_2dnav_practice)/config/local_costmap_params.yaml" command="load" />
+    
+    <!-- 加载全局代价地图的特定参数 -->
+    <rosparam file="$(find ros_2dnav_practice)/config/global_costmap_params.yaml" command="load" />
+    
+    <!-- 加载本地规划器 (local planner) 的参数 -->
+    <rosparam file="$(find ros_2dnav_practice)/config/base_local_planner_params.yaml" command="load" />
+
+  </node>
+</launch>

@@ -1,0 +1,71 @@
+<!-- gmapping.launch -->
+<launch>
+
+  <!-- 定义一个参数，用于指定激光雷达扫描话题的名称。-->
+  <!-- 这样做的好处是，如果你的激光雷达话题不是默认的/scan，可以在引用这个launch文件时轻松修改，增加了灵活性。 -->
+  <arg name="scan_topic" default="/scan" />
+
+  <!-- 启动 gmapping 包中的 slam_gmapping 节点 -->
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen" clear_params="true">
+    
+    <!-- === 坐标系参数 === -->
+    <!-- 设置机器人基座的坐标系，通常是 "base_link" -->
+    <param name="base_frame" value="base_link"/>
+    <!-- 设置里程计的坐标系，通常是 "odom" -->
+    <param name="odom_frame" value="odom"/>
+
+    <!-- === 地图更新频率参数 === -->
+    <!-- 设置地图更新的频率（秒）。这里是1秒更新并发布一次地图。 -->
+    <param name="map_update_interval" value="1.0"/>
+
+    <!-- === 激光雷达参数 === -->
+    <!-- 激光雷达的最大有效距离（米）。超出此距离的读数将被忽略。这个值通常要比激光雷达的物理最大量程小一些，以过滤掉不可靠的远距离读数。 -->
+    <param name="maxUrange" value="8.0"/>
+    <!-- 激光雷达的物理最大量程（米）。 -->
+    <param name="maxRange" value="12.0"/>
+
+    <!-- === 运动模型和滤波器参数 (核心调参区域) === -->
+    <!-- 这些参数与粒子滤波器的运动模型噪声有关，需要根据机器人的实际运动特性和里程计精度进行调整 -->
+    <param name="sigma" value="0.05"/>
+    <param name="kernelSize" value="1"/>
+    <param name="lstep" value="0.05"/>
+    <param name="astep" value="0.05"/>
+    <param name="iterations" value="5"/>
+    <param name="lsigma" value="0.075"/>
+    <param name="ogain" value="3.0"/>
+    <param name="lskip" value="0"/>
+    <!-- srr, srt, str, stt 是里程计的误差模型参数，分别对应：(平移-平移), (平移-旋转), (旋转-平移), (旋转-旋转) 的噪声。里程计越准，这些值越小。 -->
+    <param name="srr" value="0.01"/>
+    <param name="srt" value="0.02"/>
+    <param name="str" value="0.01"/>
+    <param name="stt" value="0.02"/>
+
+    <!-- === 触发更新的阈值 === -->
+    <!-- 机器人平移超过多少米后，进行一次地图更新。可以防止机器人在原地不动时频繁更新。 -->
+    <param name="linearUpdate" value="0.1"/>
+    <!-- 机器人旋转超过多少弧度后，进行一次地图更新。 -->
+    <param name="angularUpdate" value="0.436"/>
+    <!-- (弃用) 基于时间的更新。设置为负数表示不使用。 -->
+    <param name="temporalUpdate" value="-1.0"/>
+    
+    <!-- === 粒子滤波器参数 === -->
+    <!-- 决定何时进行重采样的阈值。当有效粒子数与总粒子数的比值低于这个阈值时，进行重采样。 -->
+    <param name="resampleThreshold" value="0.5"/>
+    <!-- 粒子数量。粒子越多，建图可能越稳定和准确，但计算量也越大。对于简单环境，80是一个不错的起始值。 -->
+    <param name="particles" value="100"/>
+
+    <!-- === 初始地图尺寸和分辨率 === -->
+    <!-- 地图分辨率 (米/像素)。0.05表示一个像素代表5厘米。 -->
+    <param name="delta" value="0.05"/>
+    <!-- 初始地图的最小/最大坐标（米）。gmapping会自动扩展地图，所以初始值不需要非常精确。 -->
+    <param name="xmin" value="-1.0"/>
+    <param name="ymin" value="-1.0"/>
+    <param name="xmax" value="1.0"/>
+    <param name="ymax" value="1.0"/>
+
+    <!-- === 话题重映射 === -->
+    <!-- gmapping 节点内部默认订阅名为 "/scan" 的话题。这里通过 remap 将其重定向为我们之前定义的 scan_topic 参数的值。 -->
+    <!-- 这样，我们就可以通过修改 arg 的值来让 gmapping 监听任何我们想要的激光雷达话题。 -->
+    <remap from="/scan" to="$(arg scan_topic)"/>
+  </node>
+</launch>

@@ -1,0 +1,47 @@
+<launch>
+  <arg name="robot_description_param" default="robot_description"/>
+  <!-- 假设你已经有 robot_description 在 param server（通过 xacro launch 加载），否则可直接用 spawn_model -file ... -->
+  <param name="$(arg robot_description_param)" command="$(find xacro)/xacro '$(find my_robot_description)/urdf/my_robot.xacro'" />
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_robot" output="screen"
+        args="-param $(arg robot_description_param) -urdf -model my_diff_robot -x -1.5 -y 0 -z 0.1"/>
+</launch>
+
+<launch>
+  <!-- 设置launch文件的参数 -->
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+  
+  <arg name="model" default="$(find urdf_learning)/urdf/car_robot_rplidar.xacro"/>
+  <arg name="rvizconfig" default="$(find ros_2dnav_learning)/config/car_robot_gazebo.rviz"/>
+  
+  <!-- 运行gazebo仿真环境 -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="$(arg paused)" />
+    <arg name="use_sim_time" value="$(arg use_sim_time)" />
+    <arg name="headless" value="$(arg headless)" />
+    <arg name="world_name" value="$(find ros_2dnav_learning)/world/gmap_test1.world"/>
+  </include>
+
+  <!-- 加载机器人模型描述参数 -->
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
+  
+  <!-- 运行joint_state_publisher节点,发布机器人的关节状态 -->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+  
+  <!-- 运行robot_state_publisher节点,发布tf -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen">
+    <param name="publish_frequency" type="double" value="30.0"/>
+  </node>
+  
+  <!-- 在gazebo中加载机器人模型-->
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+        args="-param robot_description -urdf -model car_robot_2diff"/>
+        
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)"/>
+  <node name="teleop_twist_keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py"/>
+</launch>

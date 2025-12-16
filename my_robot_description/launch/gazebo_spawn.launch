@@ -1,0 +1,23 @@
+<launch>
+  <!-- use sim time -->
+  <param name="use_sim_time" value="true"/>
+
+  <!-- load robot_description from xacro -->
+  <param name="robot_description" command="$(find xacro)/xacro '$(find my_robot_description)/urdf/my_robot.xacro'"/>
+
+  <!-- start robot_state_publisher so TF from joint_states->TF is published -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen">
+    <param name="publish_frequency" value="50.0"/>
+  </node>
+
+  <!-- start Gazebo (empty world) -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+  </include>
+
+  <!-- spawn robot from robot_description param -->
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" output="screen"
+        args="-param robot_description -urdf -model my_diff_robot -x 0 -y 0 -z 0.01"/>
+</launch>

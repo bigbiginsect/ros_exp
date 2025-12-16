@@ -1,0 +1,38 @@
+<launch>
+  <!-- 
+    定义一个名为 "map" 的参数，并设置其默认值为我们之前用 gmapping 创建并保存的地图文件的路径。
+    这样做可以方便地在启动时更换不同的地图文件。
+  -->
+  <param name="/use_sim_time" value="true" />
+  <arg name="map" default="$(find ros_2dnav_learning)/map/map.yaml"/>
+
+  <!-- 
+    启动 map_server 节点。
+    这个节点会读取由 "map" 参数指定的 .yaml 文件，加载对应的 .pgm 地图图片，
+    并将其作为栅格地图发布到 /map 话题上。amcl 和 move_base 节点都需要订阅这个话题。
+    args="$(arg map)" 表示将上面定义的 "map" 参数的值作为命令行参数传递给 map_server 节点。
+  -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map)"/>
+
+  <!-- 
+    包含 (include) 之前创建的 car_robot_rplidar.launch 文件。
+    这一行命令会启动 Gazebo 仿真环境、加载世界、加载机器人模型、启动 Rviz 和键盘控制节点。
+    注意：虽然键盘控制节点也启动了，但在自主导航时我们不会使用它。
+  -->
+  <include file="$(find ros_2dnav_learning)/launch/car_robot_rplidar.launch"/>
+  
+  <!-- 
+    包含 (include) amcl_diff.launch 文件。
+    这一行命令会启动 AMCL (自适应蒙特卡洛定位) 节点，负责在加载的地图中对机器人进行实时定位。
+    如果没有它，机器人就不知道自己在地图的什么位置。
+  -->
+  <include file="$(find ros_2dnav_learning)/launch/amcl_diff.launch"/>
+  
+  <!-- 
+    包含 (include) move_base.launch 文件。
+    这一行命令会启动 move_base 导航核心节点，并加载所有相关的代价地图和规划器配置文件。
+    它负责接收目标点、规划路径并控制机器人移动。
+  -->
+  <include file="$(find ros_2dnav_learning)/launch/move_base.launch"/>
+
+</launch>

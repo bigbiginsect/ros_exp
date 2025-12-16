@@ -1,0 +1,5 @@
+<launch>
+  <!-- 使用机器人描述 param 加载模型（如果你已经在 gazebo_launch 中设置了 robot_description，可跳过） -->
+  <!-- 这里直接启动 rviz，使用我们保存的 rviz 配置文件 -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find my_robot_description)/launch/my_robot.rviz" output="screen"/>
+</launch>

@@ -1,0 +1,24 @@
+<launch>
+    <!--  启动 turtlesim_node，节点名改为 my_turtle_window -->
+    <node pkg="turtlesim" type="turtlesim_node" name="my_turtle_window" output="screen">
+        <!-- 重映射话题 /turtle1/cmd_vel 为 /my_turtle/cmd_vel -->
+        <remap from="/turtle1/cmd_vel" to="/my_turtle/cmd_vel"/>
+        <remap from="/turtle1/pose" to="/my_turtle/pose"/>
+    </node>
+
+    <!-- 启动键盘控制节点，发布到自定义话题 -->
+    <node pkg="turtlesim" type="turtle_teleop_key" name="my_turtle_teleop" output="screen">
+        <remap from="/turtle1/cmd_vel" to="/my_turtle/cmd_vel"/>
+    </node>
+
+    <!--  设置乌龟速度参数（例如设置线速度与角速度） -->
+    <param name="turtle_speed/linear" value="2.0"/>
+    <param name="turtle_speed/angular" value="1.5"/>
+
+    <!--  使用 rosservice 来动态设置背景颜色或乌龟位置 -->
+    <node pkg="rosservice" type="rosservice" name="set_bg_color" args="call /clear"/>
+    <!-- 自动发布速度 -->
+<node pkg="rostopic" type="rostopic" name="auto_move" args="pub /my_turtle/cmd_vel geometry_msgs/Twist '{linear: {x: 2.0}, angular: {z: 1.0}}' -r 10"/>
+
+</launch>
+

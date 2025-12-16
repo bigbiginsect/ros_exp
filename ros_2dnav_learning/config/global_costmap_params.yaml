@@ -1,0 +1,16 @@
+global_costmap:
+  # 全局代价地图的参考坐标系。必须是 'map'，这是一个固定的世界坐标系。
+  global_frame: map
+  # 机器人的基座坐标系。
+  robot_base_frame: base_footprint
+
+  # 代价地图更新的频率 (Hz)。
+  update_frequency: 10.0
+  # 代价地图发布的频率 (Hz)，主要用于Rviz等可视化工具。
+  publish_frequency: 10.0
+  # 坐标系变换的容忍时间 (秒)。如果TF变换信息延迟超过这个时间，会报错。
+  transform_tolerance: 0.5
+
+  # 关键参数！'true' 表示全局代价地图会基于一个由 map_server 发布的静态地图来初始化。
+  # 这对于导航是必需的，因为机器人需要知道整个环境的大致轮廓。
+  static_map: true

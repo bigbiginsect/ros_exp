@@ -1,0 +1,55 @@
+TrajectoryPlannerROS:
+  # === 机器人配置参数 ===
+  # 机器人的最大和最小X方向速度 (米/秒)。这是最重要的性能参数之一。
+  max_vel_x: 0.15
+  min_vel_x: 0.07
+  # 机器人的最大和最小角速度 (弧度/秒)。
+  max_vel_theta: 1.0
+  min_vel_theta: -1.0
+  # 机器人的最小原地旋转速度  (弧度/秒)。
+  min_in_place_vel_theta: 0.3
+
+  # X、Y(通常为0)和Theta方向的加速度限制。
+  acc_lim_x: 1.0
+  acc_lim_y: 0.0 # 对于差速驱动机器人，Y方向加速度为0
+  acc_lim_theta: 0.6
+
+  # === 目标容忍度参数 ===
+  # 到达目标点的XY平面位置容忍度 (米)。小于此值即认为到达。
+  xy_goal_tolerance: 0.10
+  # 到达目标点的偏航角容忍度 (弧度)。小于此值即认为姿态正确。
+  yaw_goal_tolerance: 0.05
+
+  # === 差速驱动机器人配置 ===
+  # 关键参数！'false' 表示这是一个非完整机器人(non-holonomic)，即不能横向平移。
+  # 对于差速轮或阿克曼转向的机器人，必须设置为 false。
+  holonomic_robot: false
+
+  # === 前向模拟参数 ===
+  # 规划器向前模拟运动轨迹的时间 (秒)。值越大，规划的路径越平滑，但对动态障碍物的反应可能稍慢。
+  sim_time: 1.5
+  # X方向速度的采样数。
+  vx_samples: 18
+  # Theta方向角速度的采样数。
+  vtheta_samples: 20
+  # 模拟轨迹的步长精度 (米)。
+  sim_granularity: 0.05
+
+  # === 评分参数 (新增，用于解决偏离轨迹问题) ===
+  # 是否使用米作为评分单位，而不是栅格单元。设为 true 便于调试
+  meter_scoring: true
+  
+  # pdist_scale: 机器人离全局路径(绿线)越近，得分越高。
+  # 想要贴合路径，这个值要大。
+  pdist_scale: 1.0  
+  
+  # gdist_scale: 机器人离局部目标点越近，得分越高。
+  # 这个值太大，机器人就会试图抄近道；这个值太小，机器人会犹豫不前。
+  gdist_scale: 0.8
+  
+  # occdist_scale: 避障权重。
+  occdist_scale: 0.007
+  
+  # 航向评分参数，这也影响它是否愿意沿着路径方向走
+  heading_lookahead: 0.325
+  dwa: false # 是否使用DWA算法，通常设为true效果更好

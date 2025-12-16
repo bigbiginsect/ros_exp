@@ -1,0 +1,21 @@
+<launch>
+  <!-- 1) 把 teleop 的输出重映射到 /cmd_vel（便于我们订阅） -->
+  <node pkg="turtlesim" type="turtle_teleop_key" name="teleop_key" output="screen">
+    <!-- teleop 默认向 /turtle1/cmd_vel 发布，重映射为 /cmd_vel -->
+    <remap from="/turtle1/cmd_vel" to="/cmd_vel" />
+  </node>
+
+  <!-- 2) 启动我们的转换节点，并把它的输出打印到屏幕 -->
+  <node pkg="turtle_cmd_converter" type="cmd_converter_node" name="cmd_converter" output="screen">
+    <!-- 可通过 param 调整缩放系数 -->
+    <param name="linear_scale" value="0.5" />
+    <param name="angular_scale" value="0.6" />
+    <param name="invert_angular" value="true" />
+  </node>
+
+  <!-- 3) 启动 turtlesim，并让它订阅 /cmd_vel_cov（也就是转换后的速度） -->
+  <node pkg="turtlesim" type="turtlesim_node" name="turtlesim" output="screen">
+    <!-- turtlesim 默认监听 /turtle1/cmd_vel，我们把它重映射到 /cmd_vel_cov -->
+    <remap from="/turtle1/cmd_vel" to="/cmd_vel_cov" />
+  </node>
+</launch>

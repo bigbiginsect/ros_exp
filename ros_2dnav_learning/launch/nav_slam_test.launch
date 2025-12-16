@@ -1,0 +1,24 @@
+<!-- nav_slam_test.launch -->
+<launch>
+
+  <!-- 
+    第一步: 启动仿真环境和机器人模型。
+    这个文件负责启动Gazebo、加载世界、加载机器人模型以及发布必要的TF变换。
+    注意：PDF中写的是 car_robot_rplidar_nav.launch，这可能是一个专门为导航配置的版本。
+    您可以先尝试使用之前创建的 car_robot_rplidar.launch。
+  -->
+  <include file="$(find ros_2dnav_learning)/launch/gazebo_world.launch"/>
+
+  <!-- 
+    第二步: 启动SLAM节点。
+    我们使用 gmapping 来实时构建地图，而不是加载一个已有的地图。
+  -->
+  <include file="$(find ros_2dnav_learning)/launch/gmapping.launch"/>
+
+  <!-- 
+    第三步: 启动导航核心节点。
+    move_base 会自动订阅 gmapping 发布的 /map 话题，并基于这个动态生成的地图来进行路径规划。
+  -->
+  <include file="$(find ros_2dnav_learning)/launch/move_base.launch"/>
+
+</launch>

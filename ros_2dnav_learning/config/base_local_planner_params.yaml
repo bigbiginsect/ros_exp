@@ -1,0 +1,36 @@
+TrajectoryPlannerROS:
+  # === 机器人配置参数 ===
+  # 机器人的最大和最小X方向速度 (米/秒)。这是最重要的性能参数之一。
+  max_vel_x: 0.4
+  min_vel_x: 0.1
+  # 机器人的最大和最小角速度 (弧度/秒)。
+  max_vel_theta: 1.0
+  min_vel_theta: -1.0
+  # 机器人的最小原地旋转速度 (弧度/秒)。
+  min_in_place_vel_theta: 1.0
+
+  # X、Y(通常为0)和Theta方向的加速度限制。
+  acc_lim_x: 1.0
+  acc_lim_y: 0.0 # 对于差速驱动机器人，Y方向加速度为0
+  acc_lim_theta: 0.6
+
+  # === 目标容忍度参数 ===
+  # 到达目标点的XY平面位置容忍度 (米)。小于此值即认为到达。
+  xy_goal_tolerance: 0.10
+  # 到达目标点的偏航角容忍度 (弧度)。小于此值即认为姿态正确。
+  yaw_goal_tolerance: 0.05
+
+  # === 差速驱动机器人配置 ===
+  # 关键参数！'false' 表示这是一个非完整机器人(non-holonomic)，即不能横向平移。
+  # 对于差速轮或阿克曼转向的机器人，必须设置为 false。
+  holonomic_robot: false
+
+  # === 前向模拟参数 ===
+  # 规划器向前模拟运动轨迹的时间 (秒)。值越大，规划的路径越平滑，但对动态障碍物的反应可能稍慢。
+  sim_time: 1.0
+  # X方向速度的采样数。
+  vx_samples: 18
+  # Theta方向角速度的采样数。
+  vtheta_samples: 20
+  # 模拟轨迹的步长精度 (米)。
+  sim_granularity: 0.05

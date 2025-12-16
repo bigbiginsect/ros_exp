@@ -1,0 +1,12 @@
+<launch>
+  <!-- 1) 把 xacro 转为 robot_description param -->
+  <param name="robot_description" command="$(find xacro)/xacro $(find my_robot_description)/urdf/my_robot.xacro"/>
+
+  <!-- 2) robot_state_publisher: 从 robot_description 发布 TF（静态/关节）-->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+    <param name="publish_frequency" value="50.0" />
+  </node>
+
+  <!-- 3) 启动一个 joint_state_publisher（如果没有别的 source 发布 joint_states）-->
+  <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" output="screen" />
+</launch>

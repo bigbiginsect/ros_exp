@@ -1,0 +1,42 @@
+<launch>
+  <!-- ================= 1. 基础设置 ================= -->
+  <!-- 关键点：在真实环境中，必须设置为 false，使用系统时间 -->
+  <param name="/use_sim_time" value="false" />
+
+  <!-- ================= 2. 硬件相关的 TF 变换 ================= -->
+  <!-- 
+     从你的 turtlebot4_test.launch 中提取出来的。
+     这是连接机器人底盘(base_link)和雷达(rplidar_link)的关键。
+     注意：请确认实车运行 mapping 时是否也用了这个 TF，如果不一致会导致地图错位。
+  -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_rplidar_link_broadcaster"
+        args="0.0 0.0 0.1 1.5707963267949 0.0 0.0 base_link rplidar_link"/>
+
+  <!-- 
+     如果你的机器人需要启动底盘驱动或雷达驱动，应该在这里 include。
+     假设你是在另一个终端单独运行硬件驱动（如 roslaunch turtlebot4_bringup ...），这里就不写了。
+     如果没有单独运行，你需要把启动雷达和底盘的 launch 加进来。
+  -->
+
+  <!-- ================= 3. 加载真实环境的地图 ================= -->
+  <!-- 注意：这里默认指向 map.yaml，请确保你已经把实测扫出来的地图放在了 map 文件夹下 -->
+  <arg name="map" default="$(find ros_2dnav_practice)/map/map.yaml"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map)"/>
+
+  <!-- ================= 4. 启动 AMCL 定位 ================= -->
+  <!-- 
+     注意：你需要检查 amcl_diff.launch 里的 base_frame_id。
+     如果你的 TF 树里只有 base_link，请把 amcl_diff.launch 里的 改为 base_link，
+     或者发布一个  -> base_link 的静态变换。
+  -->
+  <include file="$(find ros_2dnav_practice)/launch/amcl_diff.launch"/>
+  
+  <!-- ================= 5. 启动 Move Base 导航 ================= -->
+  <include file="$(find ros_2dnav_practice)/launch/move_base.launch"/>
+
+  <!-- ================= 6. 可视化 Rviz ================= -->
+  <!-- 使用之前配置好的 rviz 配置 -->
+  <arg name="rvizconfig" default="$(find ros_2dnav_practice)/config/turtle_rviz.rviz"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)"/>
+
+</launch>

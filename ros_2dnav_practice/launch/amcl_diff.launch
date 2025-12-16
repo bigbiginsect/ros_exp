@@ -1,0 +1,60 @@
+<!-- amcl_diff.launch -->
+<launch>
+  <!-- 启动 amcl 包中的 amcl 节点 -->
+  <!-- "amcl" 是节点类型, "amcl_diff" 是我们给这个节点起的名字 -->
+  <node pkg="amcl" type="amcl" name="amcl_diff">
+
+    <!-- 
+      设置里程计模型。对于两轮差速驱动的机器人，使用 "diff"。
+      如果是全向轮，可能会使用 "omni"。
+    -->
+    <param name="odom_model_type" value="diff"/>
+
+    <!-- 
+      ==== 坐标系框架 (Frame IDs) ====
+      这是AMCL正常工作最关键的参数，必须与您机器人的TF树保持一致。
+      PDF P37页特别强调了这三个参数。
+    -->
+    <!-- 里程计坐标系 -->
+    <param name="odom_frame_id" value="odom"/>
+    <!-- 机器人基座坐标系 -->
+    <param name="base_frame_id" value="base_link"/>
+    <!-- 全局/地图坐标系 -->
+    <param name="global_frame_id" value="map"/>
+
+    <!-- 
+      ==== 粒子滤波器参数 (Particle Filter Parameters) ====
+      这些参数影响定位的精度和计算开销。
+    -->
+    <!-- 最小粒子数。当粒子数过少时，amcl会补充粒子直到达到这个数量。-->
+    <param name="min_particles" value="500"/>
+    <!-- 最大粒子数。粒子越多，定位越可能准确，但CPU消耗也越大。 -->
+    <param name="max_particles" value="3000"/>
+    <!-- 初始位姿估计的误差协方差 (x, y, yaw) -->
+    <param name="initial_pose_x" value="0.0"/>
+    <param name="initial_pose_y" value="0.0"/>
+    <param name="initial_pose_a" value="0.0"/>
+    
+    <!-- 
+      ==== 激光雷达模型参数 (Laser Model Parameters) ====
+      定义了如何处理激光雷达数据。
+    -->
+    <!-- 指定amcl订阅的激光雷达话题。默认是/scan，一般不需要修改。 -->
+    <param name="laser_scan_topic" value="/scan"/>
+    <!-- 激光雷达模型的类型，"likelihood_field" 是最常用的。 -->
+    <param name="laser_model_type" value="likelihood_field"/>
+    <!-- 每个粒子更新时，最多使用多少束激光。可以减少计算量。 -->
+    <param name="laser_max_beams" value="30"/>
+    
+    <!-- 
+      ==== 更新频率 (Update Rates) ====
+    -->
+    <!-- 控制滤波器更新的频率。只有在机器人移动了 linear_update 或 angular_update 指定的距离/角度后，才会进行更新。 -->
+    <param name="update_min_d" value="0.2"/> <!-- 线性移动超过0.2米更新 -->
+    <param name="update_min_a" value="0.5"/> <!-- 旋转超过0.5弧度(约30度)更新 -->
+    
+    <!-- AMCL多久发布一次TF变换 (从 map -> odom) -->
+    <param name="transform_tolerance" value="0.2"/>
+    
+  </node>
+</launch>

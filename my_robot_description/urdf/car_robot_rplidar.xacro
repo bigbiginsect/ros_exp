@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<robot name="car_robot_rplidar" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- 1. 包含底盘和雷达的xacro文件 -->
+    <xacro:include filename="$(find my_robot_description)/urdf/car_chassis_2diff_gazebo.xacro" />
+    <xacro:include filename="$(find my_robot_description)/urdf/rplidar_gazebo.xacro" />
+
+    <!-- 2. 实例化底盘和雷达 -->
+    <xacro:car_chassis_2diff/>
+    <xacro:rplidar_A1M8/>
+
+    <!-- 3. 添加关节，将雷达(laser_link)固定在底盘(base_link)上 -->
+    <joint name="rplidar_joint" type="fixed">
+      <!-- 将雷达放在底盘顶部中心位置 -->
+      <origin xyz="0 0 0.08" rpy="0 0 0" /> <!-- base_height/2 = 0.08/2 = 0.04 -->
+      <parent link="base_link"/>
+      <child link="laser_link"/>
+    </joint>
+
+</robot>
